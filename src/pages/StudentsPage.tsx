@@ -185,7 +185,7 @@ export default function StudentsPage() {
                         {/* Filtros */}
                         <div className="rounded-xl border bg-white p-6">
                             <div className="flex items-center gap-2 mb-6">
-                                <span className="text-xl">⚙️</span>
+                                <span className="text-xl"></span>
                                 <h3 className="text-lg font-semibold text-gray-900">Filtros de Búsqueda</h3>
                             </div>
                             <div className="grid grid-cols-3 gap-6">
@@ -272,7 +272,7 @@ export default function StudentsPage() {
                                     <div className="bg-gradient-to-r from-blue-900 to-teal-600 p-8 text-white">
                                         <div className="flex items-center gap-4">
                                             <div className="w-20 h-20 rounded-full bg-blue-800 flex items-center justify-center text-4xl">
-                                                👨‍🎓
+                                                
                                             </div>
                                             <div>
                                                 {isEditing ? (
@@ -306,7 +306,7 @@ export default function StudentsPage() {
                                     {/* Información de Contacto */}
                                     <div className="p-8 border-b border-gray-200 grid grid-cols-2 gap-8">
                                         <div className="flex items-center gap-3">
-                                            <span className="text-xl text-teal-600">✉️</span>
+                                            <span className="text-xl text-teal-600"></span>
                                             <div>
                                                 <p className="text-sm text-gray-600">Email</p>
                                                 {isEditing ? (
@@ -323,7 +323,7 @@ export default function StudentsPage() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-xl text-teal-600">📞</span>
+                                            <span className="text-xl text-teal-600"></span>
                                             <div>
                                                 <p className="text-sm text-gray-600">Teléfono</p>
                                                 {isEditing ? (
@@ -340,7 +340,7 @@ export default function StudentsPage() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-xl text-teal-600">📍</span>
+                                            <span className="text-xl text-teal-600"></span>
                                             <div>
                                                 <p className="text-sm text-gray-600">Ubicación</p>
                                                 {isEditing ? (
@@ -357,7 +357,7 @@ export default function StudentsPage() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-xl text-teal-600">🆔</span>
+                                            <span className="text-xl text-teal-600"></span>
                                             <div>
                                                 <p className="text-sm text-gray-600">Identificación</p>
                                                 <p className="text-gray-900">{student.tipo_identificacion} {student.numero_identificacion}</p>
@@ -368,7 +368,7 @@ export default function StudentsPage() {
                             {/* Resumen Profesional */}
                             <div className="p-8 border-b border-gray-200">
                                 <div className="flex items-center gap-2 mb-4">
-                                    <span className="text-xl">👤</span>
+                                    <span className="text-xl"></span>
                                     <h4 className="text-lg font-bold text-gray-900">Resumen Profesional</h4>
                                 </div>
                                 <p className="text-gray-700 leading-relaxed">
@@ -379,7 +379,7 @@ export default function StudentsPage() {
                                     {/* Formación Académica */}
                                     <div className="p-8">
                                         <div className="flex items-center gap-2 mb-6">
-                                            <span className="text-xl">🎓</span>
+                                            <span className="text-xl"></span>
                                             <h4 className="text-lg font-bold text-gray-900">Formación Académica</h4>
                                         </div>
                                         <div className="border-l-4 border-teal-600 pl-6 pb-6">
