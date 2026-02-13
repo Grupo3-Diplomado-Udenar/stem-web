@@ -1,6 +1,7 @@
 import { useDeferredValue, useMemo } from "react";
 
-interface Oferta {
+export interface Oferta {
+    id: number;
     title: string;
     company: string;
     location: string;
@@ -11,24 +12,31 @@ interface Oferta {
 
 interface OfertasRecientesProps {
     onVerDetalles?: (oferta: Oferta) => void;
+    onPostular?: (oferta: Oferta) => void;
     onVerTodas?: () => void;
     isAuthenticated?: boolean;
     searchTerm?: string;
     isLoading?: boolean;
     errorMessage?: string;
+    applyingId?: number | null;
+    appliedIds?: number[];
 }
 
 export default function OfertasRecientes({
     onVerDetalles,
+    onPostular,
     onVerTodas,
     isAuthenticated,
     searchTerm,
     isLoading,
     errorMessage,
+    applyingId,
+    appliedIds,
 }: OfertasRecientesProps) {
     const ofertas = useMemo<Oferta[]>(
         () => [
             {
+                id: 1,
                 title: "Desarrollador Full Stack Junior",
                 company: "TechCorp",
                 location: "Pasto, Nariño",
@@ -37,6 +45,7 @@ export default function OfertasRecientes({
                 skills: ["React", "Node.js", "PostgreSQL"],
             },
             {
+                id: 2,
                 title: "Analista de Datos",
                 company: "DataLabs",
                 location: "Remoto",
@@ -45,6 +54,7 @@ export default function OfertasRecientes({
                 skills: ["Python", "Pandas", "SQL", "Tableau"],
             },
             {
+                id: 3,
                 title: "Ingeniero de Machine Learning",
                 company: "InnovateTech",
                 location: "Bogotá",
@@ -53,6 +63,7 @@ export default function OfertasRecientes({
                 skills: ["Python", "TensorFlow", "Scikit-learn"],
             },
             {
+                id: 5,
                 title: "Desarrollador Backend",
                 company: "CloudSystems",
                 location: "Medellín",
@@ -106,8 +117,11 @@ export default function OfertasRecientes({
                 </div>
             ) : (
                 <div className="space-y-4">
-                    {filteredOfertas.map((oferta, idx) => (
-                    <div key={idx} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition bg-white flex items-center justify-between">
+                    {filteredOfertas.map((oferta) => {
+                        const isApplying = applyingId === oferta.id;
+                        const isApplied = appliedIds?.includes(oferta.id) ?? false;
+                        return (
+                    <div key={oferta.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition bg-white flex items-center justify-between">
                         <div className="flex-1">
                             <div className="flex items-start gap-4">
                                 <div className="text-3xl">💼</div>
@@ -131,12 +145,12 @@ export default function OfertasRecientes({
                         </div>
                         <div className="ml-4 flex flex-col gap-2">
                             <button 
-                                onClick={() => onVerDetalles?.(oferta)}
-                                disabled={!isAuthenticated}
+                                onClick={() => onPostular?.(oferta)}
+                                disabled={!isAuthenticated || isApplying || isApplied}
                                 title={!isAuthenticated ? "Debes iniciar sesión para postularte a esta oferta" : ""}
                                 className="px-6 py-2 bg-blue-900 text-white rounded-lg font-medium hover:bg-blue-950 transition whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Postularse
+                                {isApplied ? "Postulado" : isApplying ? "Postulando..." : "Postularse"}
                             </button>
                             <button 
                                 onClick={() => onVerDetalles?.(oferta)}
@@ -146,7 +160,8 @@ export default function OfertasRecientes({
                             </button>
                         </div>
                     </div>
-                    ))}
+                    );
+                })}
                 </div>
             )}
         </div>
