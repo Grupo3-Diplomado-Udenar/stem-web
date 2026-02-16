@@ -10,6 +10,9 @@ export default function StudentExploreTab() {
     const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const [applyingId, setApplyingId] = useState<number | null>(null);
     const [appliedIds, setAppliedIds] = useState<number[]>([]);
+    const [filterOrganization, setFilterOrganization] = useState("");
+    const [filterTitle, setFilterTitle] = useState("");
+    const [sortByDate, setSortByDate] = useState("");
     const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const showToast = (message: string, type: "success" | "error") => {
@@ -78,17 +81,12 @@ export default function StudentExploreTab() {
 
     return (
         <div className="space-y-8">
-            {/* Hero Section */}
-            <div className="rounded-2xl bg-gradient-to-r from-blue-900 to-teal-600 p-8 text-white">
-                <h2 className="text-3xl font-bold mb-2">Encuentra tu Práctica Profesional Ideal</h2>
-                <p className="text-blue-100">Conectamos talento STEM con las mejores oportunidades del sector productivo</p>
-            </div>
-
             {/* Filtros */}
-            <FiltersPanel />
-
-            {/* Empresas Destacadas */}
-            <EmpresasDestacadas onVerTodas={() => { }} />
+            <FiltersPanel 
+                onOrganizationChange={setFilterOrganization}
+                onTitleChange={setFilterTitle}
+                onDateChange={setSortByDate}
+            />
 
             {/* Ofertas Recientes */}
             <OfertasRecientes
@@ -98,10 +96,15 @@ export default function StudentExploreTab() {
                 }}
                 onVerTodas={() => { }}
                 isAuthenticated={true}
-                searchTerm=""
                 applyingId={applyingId}
                 appliedIds={appliedIds}
+                filterOrganization={filterOrganization}
+                filterTitle={filterTitle}
+                sortByDate={sortByDate}
             />
+
+            {/* Empresas Destacadas */}
+            <EmpresasDestacadas onVerTodas={() => { }} />
             {toast ? <Toast message={toast.message} type={toast.type} position="top-center" /> : null}
         </div>
     );
