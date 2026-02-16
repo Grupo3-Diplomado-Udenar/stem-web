@@ -1,4 +1,6 @@
-import { useDeferredValue, useMemo } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { offersApi } from "../api/offers";
+import { organizationsApi } from "../api/organizations";
 
 export interface Oferta {
     id: number;
@@ -7,7 +9,7 @@ export interface Oferta {
     location: string;
     type: string;
     posted: string;
-    skills: string[];
+    skills?: string[];
 }
 
 interface OfertasRecientesProps {
@@ -33,58 +35,110 @@ export default function OfertasRecientes({
     applyingId,
     appliedIds,
 }: OfertasRecientesProps) {
-    const ofertas = useMemo<Oferta[]>(
-        () => [
-            {
-                id: 1,
-                title: "Desarrollador Full Stack Junior",
-                company: "TechCorp",
-                location: "Pasto, Nariño",
-                type: "Práctica Profesional",
-                posted: "Publicado hace 2 días",
-                skills: ["React", "Node.js", "PostgreSQL"],
-            },
-            {
-                id: 2,
-                title: "Analista de Datos",
-                company: "DataLabs",
-                location: "Remoto",
-                type: "Contrato",
-                posted: "Publicado hace 3 días",
-                skills: ["Python", "Pandas", "SQL", "Tableau"],
-            },
-            {
-                id: 3,
-                title: "Ingeniero de Machine Learning",
-                company: "InnovateTech",
-                location: "Bogotá",
-                type: "Práctica Profesional",
-                posted: "Publicado hace 5 días",
-                skills: ["Python", "TensorFlow", "Scikit-learn"],
-            },
-            {
-                id: 5,
-                title: "Desarrollador Backend",
-                company: "CloudSystems",
-                location: "Medellín",
-                type: "Pasantía",
-                posted: "Publicado hace 1 semana",
-                skills: ["Java", "Spring Boot", "AWS"],
-            },
-        ],
-        []
-    );
+    const [ofertas, setOfertas] = useState<Oferta[]>([]);
+    const [internalLoading, setInternalLoading] = useState(false);
+    const [internalError, setInternalError] = useState<string | null>(null);
+    const orgCacheRef = useRef<Map<string, string>>(new Map());
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const formatPosted = (value: string | null | undefined) => {
+            if (!value) return "Publicado";
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return "Publicado";
+            const formatted = new Intl.DateTimeFormat("es-CO", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+            }).format(date);
+            return `Publicado el ${formatted}`;
+        };
+
+        const resolveOrganizationNames = async (organizationIds: string[]) => {
+            const unique = Array.from(new Set(organizationIds)).filter(Boolean);
+            const missing = unique.filter((id) => !orgCacheRef.current.has(id));
+            if (missing.length === 0) return;
+
+            const results = await Promise.all(
+                missing.map(async (id) => {
+                    try {
+                        const organization = await organizationsApi.get(id);
+                        return { id, name: organization.nombre };
+                    } catch {
+                        return { id, name: "Organización" };
+                    }
+                })
+            );
+
+            results.forEach(({ id, name }) => {
+                orgCacheRef.current.set(id, name);
+            });
+        };
+
+        const fetchOffers = async () => {
+            setInternalLoading(true);
+            setInternalError(null);
+            try {
+                const records = await offersApi.list();
+                const organizationIds = records.map((record) => record.id_organizacion);
+                await resolveOrganizationNames(organizationIds);
+
+                if (!isMounted) return;
+
+                setOfertas(
+                    records.map((record) => ({
+                        id: record.id_oferta,
+                        title: record.titulo,
+                        company: orgCacheRef.current.get(record.id_organizacion) ?? "Organización",
+                        location: record.ubicacion,
+                        type: record.tipo_contrato,
+                        posted: formatPosted(record.fecha_publicacion),
+                        skills: [],
+                    }))
+                );
+            } catch (error) {
+                if (!isMounted) return;
+                const message = error instanceof Error ? error.message : "No se pudieron cargar las ofertas.";
+                setInternalError(message);
+            } finally {
+                if (isMounted) {
+                    setInternalLoading(false);
+                }
+            }
+        };
+
+        fetchOffers();
+        const intervalId = setInterval(fetchOffers, 30000);
+
+        const handleVisibility = () => {
+            if (document.visibilityState === "visible") {
+                fetchOffers();
+            }
+        };
+
+        document.addEventListener("visibilitychange", handleVisibility);
+        return () => {
+            clearInterval(intervalId);
+            document.removeEventListener("visibilitychange", handleVisibility);
+            isMounted = false;
+        };
+    }, []);
+
+    const loading = isLoading ?? internalLoading;
+    const error = errorMessage ?? internalError;
     const deferredSearch = useDeferredValue(searchTerm ?? "");
     const normalizedSearch = deferredSearch.trim().toLowerCase();
     const filteredOfertas = useMemo(() => {
         if (!normalizedSearch) return ofertas;
         return ofertas.filter((oferta) => {
+            const skillsText = oferta.skills?.join(" ") ?? "";
             const haystack = [
                 oferta.title,
                 oferta.company,
                 oferta.location,
                 oferta.type,
-                oferta.skills.join(" "),
+                skillsText,
             ]
                 .join(" ")
                 .toLowerCase();
@@ -103,11 +157,11 @@ export default function OfertasRecientes({
                     Ver todas
                 </button>
             </div>
-            {errorMessage ? (
+            {error ? (
                 <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
-                    {errorMessage}
+                    {error}
                 </div>
-            ) : isLoading ? (
+            ) : loading ? (
                 <div className="rounded-xl border border-gray-200 bg-white p-6 text-gray-600">
                     Cargando ofertas...
                 </div>
@@ -124,22 +178,23 @@ export default function OfertasRecientes({
                     <div key={oferta.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition bg-white flex items-center justify-between">
                         <div className="flex-1">
                             <div className="flex items-start gap-4">
-                                <div className="text-3xl">💼</div>
                                 <div className="flex-1">
                                     <h4 className="text-lg font-bold text-gray-900 mb-1">{oferta.title}</h4>
                                     <p className="text-sm text-gray-600 mb-2">{oferta.company}</p>
                                     <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                                        <span>📍 {oferta.location}</span>
-                                        <span>📋 {oferta.type}</span>
+                                        <span>Ubicacion: {oferta.location}</span>
+                                        <span>Contrato: {oferta.type}</span>
                                         <span>• {oferta.posted}</span>
                                     </div>
-                                    <div className="flex gap-2 flex-wrap">
-                                        {oferta.skills.map((skill) => (
-                                            <span key={skill} className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-cyan-100 text-cyan-700">
-                                                {skill}
-                                            </span>
-                                        ))}
-                                    </div>
+                                    {oferta.skills && oferta.skills.length > 0 ? (
+                                        <div className="flex gap-2 flex-wrap">
+                                            {oferta.skills.map((skill) => (
+                                                <span key={skill} className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-cyan-100 text-cyan-700">
+                                                    {skill}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    ) : null}
                                 </div>
                             </div>
                         </div>
