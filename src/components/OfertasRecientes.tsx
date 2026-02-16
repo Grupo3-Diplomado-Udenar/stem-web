@@ -48,6 +48,7 @@ export default function OfertasRecientes({
     const [internalLoading, setInternalLoading] = useState(false);
     const [internalError, setInternalError] = useState<string | null>(null);
     const [selectedOferta, setSelectedOferta] = useState<Oferta | null>(null);
+    const [visibleCount, setVisibleCount] = useState(6);
     const orgCacheRef = useRef<Map<string, string>>(new Map());
 
     useEffect(() => {
@@ -191,15 +192,34 @@ export default function OfertasRecientes({
         return result;
     }, [normalizedOrgFilter, normalizedTitleFilter, sortByDate, ofertas]);
 
+    // Reset visible count when filters change
+    useEffect(() => {
+        setVisibleCount(6);
+    }, [normalizedOrgFilter, normalizedTitleFilter, sortByDate]);
+
     const handleVerDetalles = (oferta: Oferta) => {
         setSelectedOferta(oferta);
         onVerDetalles?.(oferta);
     };
 
+    const handleLoadMore = () => {
+        setVisibleCount((prev) => prev + 6);
+    };
+
+    const visibleOfertas = filteredOfertas.slice(0, visibleCount);
+    const hasMore = visibleCount < filteredOfertas.length;
+
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-gray-900">Ofertas Recientes</h3>
+                <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Ofertas Recientes</h3>
+                    {filteredOfertas.length > 0 && (
+                        <p className="text-sm text-gray-600 mt-1">
+                            {filteredOfertas.length} {filteredOfertas.length === 1 ? 'oferta encontrada' : 'ofertas encontradas'}
+                        </p>
+                    )}
+                </div>
                 <button 
                     onClick={onVerTodas}
                     className="text-teal-600 hover:text-teal-700 font-medium transition"
@@ -220,101 +240,103 @@ export default function OfertasRecientes({
                     No hay ofertas que coincidan con tu búsqueda.
                 </div>
             ) : (
-                <div className="space-y-4">
-                    {filteredOfertas.map((oferta) => {
-                        const isApplying = applyingId === oferta.id;
-                        const isApplied = appliedIds?.includes(oferta.id) ?? false;
-                        return (
-                    <div key={oferta.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition bg-white flex items-center justify-between">
-                        <div className="flex-1">
-                            <div className="flex items-start gap-4">
-                                <div className="flex-1">
-                                    <h4 className="text-lg font-bold text-gray-900 mb-1">{oferta.title}</h4>
-                                    <p className="text-sm text-gray-600 mb-2">{oferta.company}</p>
-                                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                                        <span>Ubicacion: {oferta.location}</span>
-                                        <span>Contrato: {oferta.type}</span>
-                                        <span>• {oferta.posted}</span>
-                                    </div>
-                                    {oferta.skills && oferta.skills.length > 0 ? (
-                                        <div className="flex gap-2 flex-wrap">
-                                            {oferta.skills.map((skill) => (
-                                                <span key={skill} className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-cyan-100 text-cyan-700">
-                                                    {skill}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    ) : null}
+                <>
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {visibleOfertas.map((oferta) => {
+                            const isApplying = applyingId === oferta.id;
+                            const isApplied = appliedIds?.includes(oferta.id) ?? false;
+                            return (
+                        <div key={oferta.id} className="border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-teal-500 transition bg-white flex flex-col">
+                            <h4 className="text-base font-bold text-gray-900 mb-1 line-clamp-2">{oferta.title}</h4>
+                            <p className="text-sm text-teal-600 font-medium mb-3">{oferta.company}</p>
+                            <div className="space-y-1 text-xs text-gray-600 mb-4 flex-1">
+                                <div className="flex items-center gap-1">
+                                    <span className="font-medium">Ubicación:</span>
+                                    <span>{oferta.location}</span>
                                 </div>
+                                <div className="flex items-center gap-1">
+                                    <span className="font-medium">Contrato:</span>
+                                    <span>{oferta.type}</span>
+                                </div>
+                                <div className="text-gray-500">{oferta.posted}</div>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <button 
+                                    onClick={() => handleVerDetalles(oferta)}
+                                    className="w-full px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+                                >
+                                    Ver Detalles
+                                </button>
+                                <button 
+                                    onClick={() => onPostular?.(oferta)}
+                                    disabled={!isAuthenticated || isApplying || isApplied}
+                                    title={!isAuthenticated ? "Debes iniciar sesión para postularte a esta oferta" : ""}
+                                    className="w-full px-4 py-2 bg-blue-900 text-white rounded-lg text-sm font-medium hover:bg-blue-950 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isApplied ? "Postulado" : isApplying ? "Postulando..." : "Postularse"}
+                                </button>
                             </div>
                         </div>
-                        <div className="ml-4 flex flex-col gap-2">
-                            <button 
-                                onClick={() => onPostular?.(oferta)}
-                                disabled={!isAuthenticated || isApplying || isApplied}
-                                title={!isAuthenticated ? "Debes iniciar sesión para postularte a esta oferta" : ""}
-                                className="px-6 py-2 bg-blue-900 text-white rounded-lg font-medium hover:bg-blue-950 transition whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                        );
+                    })}
+                    </div>
+                    {hasMore && (
+                        <div className="mt-6 text-center">
+                            <button
+                                onClick={handleLoadMore}
+                                className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium transition"
                             >
-                                {isApplied ? "Postulado" : isApplying ? "Postulando..." : "Postularse"}
-                            </button>
-                            <button 
-                                onClick={() => handleVerDetalles(oferta)}
-                                className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition whitespace-nowrap"
-                            >
-                                Ver Detalles
+                                Ver más ofertas ({filteredOfertas.length - visibleCount} restantes)
                             </button>
                         </div>
-                    </div>
-                    );
-                })}
-                </div>
+                    )}
+                </>
             )}
             {selectedOferta ? (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                    <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl">
-                        <div className="flex items-start justify-between gap-4">
-                            <h4 className="text-xl font-bold text-gray-900">{selectedOferta.title}</h4>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setSelectedOferta(null)}>
+                    <div className="w-full max-w-2xl max-h-[90vh] rounded-2xl bg-white shadow-xl flex flex-col" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-start justify-between gap-4 p-6 border-b border-gray-200">
+                            <div className="flex-1">
+                                <h4 className="text-xl font-bold text-gray-900 mb-1">{selectedOferta.title}</h4>
+                                <p className="text-sm text-teal-600 font-medium">{selectedOferta.company}</p>
+                            </div>
                             <button
                                 onClick={() => setSelectedOferta(null)}
-                                className="rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
+                                className="rounded-full border border-gray-300 px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 transition"
                                 aria-label="Cerrar detalles"
                             >
-                                Cerrar
+                                ✕
                             </button>
                         </div>
-                        <div className="mt-4 space-y-4 text-sm text-gray-700">
+                        <div className="overflow-y-auto p-6 space-y-4 text-sm text-gray-700">
                             <div>
-                                <p className="text-xs font-semibold uppercase text-gray-500">Organizacion</p>
-                                <p>{selectedOferta.company}</p>
+                                <p className="text-xs font-semibold uppercase text-gray-500 mb-1">Descripción</p>
+                                <p className="text-gray-700 leading-relaxed">{selectedOferta.description}</p>
                             </div>
                             <div>
-                                <p className="text-xs font-semibold uppercase text-gray-500">Descripcion</p>
-                                <p>{selectedOferta.description}</p>
+                                <p className="text-xs font-semibold uppercase text-gray-500 mb-1">Requisitos</p>
+                                <p className="text-gray-700 leading-relaxed">{selectedOferta.requirements}</p>
                             </div>
-                            <div>
-                                <p className="text-xs font-semibold uppercase text-gray-500">Requisitos</p>
-                                <p>{selectedOferta.requirements}</p>
-                            </div>
-                            <div className="grid gap-3 sm:grid-cols-2">
-                                <div>
-                                    <p className="text-xs font-semibold uppercase text-gray-500">Tipo de contrato</p>
-                                    <p>{selectedOferta.type}</p>
+                            <div className="grid gap-4 sm:grid-cols-2 pt-2">
+                                <div className="bg-gray-50 p-3 rounded-lg">
+                                    <p className="text-xs font-semibold uppercase text-gray-500 mb-1">Tipo de contrato</p>
+                                    <p className="text-gray-900 font-medium">{selectedOferta.type}</p>
                                 </div>
-                                <div>
-                                    <p className="text-xs font-semibold uppercase text-gray-500">Ubicacion</p>
-                                    <p>{selectedOferta.location}</p>
+                                <div className="bg-gray-50 p-3 rounded-lg">
+                                    <p className="text-xs font-semibold uppercase text-gray-500 mb-1">Ubicación</p>
+                                    <p className="text-gray-900 font-medium">{selectedOferta.location}</p>
                                 </div>
-                                <div>
-                                    <p className="text-xs font-semibold uppercase text-gray-500">Salario</p>
-                                    <p>{selectedOferta.salary}</p>
+                                <div className="bg-gray-50 p-3 rounded-lg">
+                                    <p className="text-xs font-semibold uppercase text-gray-500 mb-1">Salario</p>
+                                    <p className="text-gray-900 font-medium">{selectedOferta.salary}</p>
                                 </div>
-                                <div>
-                                    <p className="text-xs font-semibold uppercase text-gray-500">Fecha de publicacion</p>
-                                    <p>{selectedOferta.posted}</p>
+                                <div className="bg-gray-50 p-3 rounded-lg">
+                                    <p className="text-xs font-semibold uppercase text-gray-500 mb-1">Fecha de publicación</p>
+                                    <p className="text-gray-900 font-medium">{selectedOferta.posted}</p>
                                 </div>
-                                <div>
-                                    <p className="text-xs font-semibold uppercase text-gray-500">Fecha de cierre</p>
-                                    <p>{selectedOferta.closeDate}</p>
+                                <div className="bg-gray-50 p-3 rounded-lg sm:col-span-2">
+                                    <p className="text-xs font-semibold uppercase text-gray-500 mb-1">Fecha de cierre</p>
+                                    <p className="text-gray-900 font-medium">{selectedOferta.closeDate}</p>
                                 </div>
                             </div>
                         </div>
