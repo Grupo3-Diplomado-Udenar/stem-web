@@ -10,9 +10,8 @@ export default function FiltersPanel({
     onDateChange,
 }: FiltersPanelProps) {
     return (
-        <div className="rounded-2xl bg-gradient-to-r from-blue-900 to-teal-600 p-8 text-white">
-            <h2 className="text-3xl font-bold mb-2">Encuentra tu Práctica Profesional Ideal</h2>
-            <p className="mb-6 text-blue-100">Conectamos talento STEM con las mejores oportunidades del sector productivo</p>
+        <div className="bg-gradient-to-r from-blue-900 to-teal-600 p-8 text-white">
+            
             <div className="grid grid-cols-3 gap-6">
                 <div>
                     <label className="block text-sm font-medium text-white mb-2">Organización</label>
