@@ -1,26 +1,68 @@
-// TODO: Conectar este componente con el backend
-// Empresas destacadas deben ordenarse por mayor número de postulaciones
-// Pendiente implementación de consulta dinámica
+import { useEffect, useState } from "react";
+import { organizationsApi, type FeaturedOrganization } from "../api/organizations";
 
 interface EmpresasDestacadasProps {
     onVerTodas?: () => void;
 }
 
+const SECTOR_ICONS: Record<string, string> = {
+    "Technology": "💻",
+    "Software": "💻",
+    "Análisis de Datos": "📊",
+    "Data": "📊",
+    "IA & ML": "💡",
+    "Cloud Computing": "☁️",
+    "Biotecnología": "🧬",
+    "Ciberseguridad": "🔒",
+};
+
+function getSectorIcon(sector: string | null): string {
+    if (!sector) return "🏢";
+    return SECTOR_ICONS[sector] ?? "🏢";
+}
+
 export default function EmpresasDestacadas({ onVerTodas }: EmpresasDestacadasProps) {
-    const empresas = [
-        { name: "TechCorp", category: "Software", icon: "💻", vacantes: 12 },
-        { name: "DataLabs", category: "Análisis de Datos", icon: "📊", vacantes: 8 },
-        { name: "InnovateTech", category: "IA & ML", icon: "💡", vacantes: 15 },
-        { name: "CloudSystems", category: "Cloud Computing", icon: "☁️", vacantes: 6 },
-        { name: "BioTech Solutions", category: "Biotecnología", icon: "🧬", vacantes: 9 },
-        { name: "CyberSecure", category: "Ciberseguridad", icon: "🔒", vacantes: 7 },
-    ];
+    const [empresas, setEmpresas] = useState<FeaturedOrganization[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        organizationsApi
+            .listFeatured()
+            .then(setEmpresas)
+            .catch((err) => setError(err.message ?? "Error al cargar empresas"))
+            .finally(() => setLoading(false));
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-8 text-red-500">
+                <p>{error}</p>
+            </div>
+        );
+    }
+
+    if (empresas.length === 0) {
+        return (
+            <div className="text-center py-8 text-gray-500">
+                <p>No hay empresas destacadas por el momento.</p>
+            </div>
+        );
+    }
 
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-gray-900">Empresas Destacadas</h3>
-                <button 
+                <button
                     onClick={onVerTodas}
                     className="text-teal-600 hover:text-teal-700 font-medium transition"
                 >
@@ -29,12 +71,26 @@ export default function EmpresasDestacadas({ onVerTodas }: EmpresasDestacadasPro
             </div>
             <div className="grid grid-cols-3 gap-6">
                 {empresas.map((empresa) => (
-                    <div key={empresa.name} className="rounded-xl border border-gray-200 p-6 hover:shadow-lg transition cursor-pointer bg-white">
-                        <div className="text-4xl mb-3">{empresa.icon}</div>
-                        <h4 className="text-lg font-bold text-gray-900 mb-1">{empresa.name}</h4>
-                        <p className="text-sm text-gray-600 mb-4">{empresa.category}</p>
+                    <div
+                        key={empresa.id_organizacion}
+                        className="rounded-xl border border-gray-200 p-6 hover:shadow-lg transition cursor-pointer bg-white"
+                    >
+                        {empresa.logo_url ? (
+                            <img
+                                src={empresa.logo_url}
+                                alt={empresa.nombre}
+                                className="h-12 w-12 object-contain mb-3 rounded"
+                            />
+                        ) : (
+                            <div className="text-4xl mb-3">{getSectorIcon(empresa.sector)}</div>
+                        )}
+                        <h4 className="text-lg font-bold text-gray-900 mb-1">{empresa.nombre}</h4>
+                        <p className="text-sm text-gray-600 mb-4">{empresa.sector ?? "Sin sector"}</p>
                         <div className="flex items-center gap-1 text-teal-600 font-medium">
-                            📍 {empresa.vacantes} vacantes activas
+                            📍 {empresa.vacantes_activas} vacantes activas
+                        </div>
+                        <div className="text-xs text-gray-400 mt-1">
+                            {empresa.total_postulaciones} postulaciones
                         </div>
                     </div>
                 ))}
