@@ -14,4 +14,11 @@ export interface OrganizationRecord {
 
 export const organizationsApi = {
     get: (id: string) => http<OrganizationRecord>(`/organizations/${id}`),
+    update: (id: string, dto: Partial<OrganizationRecord>) => {
+        return http<OrganizationRecord>(`/organizations/${id}`, {
+            method: "PUT",
+            body: JSON.stringify(dto),
+            headers: { "Content-Type": "application/json" },
+        });
+    },
 };

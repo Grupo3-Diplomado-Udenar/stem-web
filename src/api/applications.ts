@@ -35,4 +35,13 @@ export const applicationsApi = {
             },
         });
     },
+    listByOrganization: (orgId: string) => {
+        const token = getToken();
+        return http<ApplicationRecord[]>(`/applications/organization/${orgId}`, {
+            method: "GET",
+            headers: {
+                Authorization: token ? `Bearer ${token}` : "",
+            },
+        });
+    },
 };

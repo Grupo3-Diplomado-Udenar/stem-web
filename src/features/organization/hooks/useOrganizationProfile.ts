@@ -1,5 +1,12 @@
 import { useState } from "react";
 import { useProfileQuery, useUpdateProfileMutation } from "../../../hook/useProfile";
+import {
+    useOrganizationOffersQuery,
+    useCreateOfferMutation,
+    useUpdateOfferMutation,
+    useDeleteOfferMutation
+} from "../../../hook/useOffers";
+import { useOrganizationApplicantsQuery } from "../../../hook/useApplications";
 import type { Oferta, OrganizationProfile } from "../types/organization.types";
 
 export const useOrganizationProfile = (activeTab: string) => {
@@ -7,6 +14,7 @@ export const useOrganizationProfile = (activeTab: string) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState<Partial<OrganizationProfile>>({});
     const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const [editingOfferId, setEditingOfferId] = useState<number | null>(null);
     const [oferta, setOferta] = useState<Oferta>({
         titulo: "",
         descripcion: "",
@@ -21,6 +29,14 @@ export const useOrganizationProfile = (activeTab: string) => {
     const profileQuery = useProfileQuery(activeTab === "perfil");
     const updateProfileMutation = useUpdateProfileMutation();
     const profile = profileQuery.data as OrganizationProfile | undefined;
+    const orgId = profile?.id_organizacion;
+
+    const offersQuery = useOrganizationOffersQuery(orgId);
+    const createOfferMutation = useCreateOfferMutation();
+    const updateOfferMutation = useUpdateOfferMutation();
+    const deleteOfferMutation = useDeleteOfferMutation();
+    const applicantsQuery = useOrganizationApplicantsQuery(activeTab === "aplicantes" ? orgId : undefined);
+
     const profileErrorMessage = profileQuery.error instanceof Error
         ? profileQuery.error.message
         : "No pudimos cargar el perfil.";
@@ -92,19 +108,78 @@ export const useOrganizationProfile = (activeTab: string) => {
         }));
     };
 
-    const handlePublish = () => {
-        console.log("Oferta publicada:", oferta);
-        alert("Oferta publicada exitosamente");
-        setOferta({
-            titulo: "",
-            descripcion: "",
-            tipo: "Práctica Profesional",
-            ubicacion: "",
-            duracion: "",
-            salario: "",
-            habilidades: [],
+    const handlePublish = async () => {
+        if (!orgId) {
+            setSaveMessage({
+                type: "error",
+                text: "No se pudo identificar la organización. Intenta recargar la página."
+            });
+            return;
+        }
+
+        const payload = {
+            ...oferta,
+            id_organizacion: orgId,
+            requisitos: oferta.habilidades.join(", "),
+            tipo_contrato: oferta.tipo,
+        };
+
+        const mutation = editingOfferId ? updateOfferMutation : createOfferMutation;
+        const variables = editingOfferId
+            ? { id: editingOfferId, dto: payload }
+            : payload;
+
+        mutation.mutate(variables as any, {
+            onSuccess: () => {
+                setSaveMessage({
+                    type: "success",
+                    text: editingOfferId ? "Oferta actualizada" : "Oferta publicada"
+                });
+                setOferta({
+                    titulo: "",
+                    descripcion: "",
+                    tipo: "Práctica Profesional",
+                    ubicacion: "",
+                    duracion: "",
+                    salario: "",
+                    habilidades: [],
+                });
+                setEditingOfferId(null);
+                setShowForm(false);
+                setTimeout(() => setSaveMessage(null), 3000);
+            },
+            onError: (error: any) => {
+                setSaveMessage({
+                    type: "error",
+                    text: error.message || "Error al procesar la oferta"
+                });
+            }
         });
-        setShowForm(false);
+    };
+
+    const handleEditOffer = (offer: any) => {
+        setEditingOfferId(offer.id_oferta);
+        setOferta({
+            titulo: offer.titulo,
+            descripcion: offer.descripcion,
+            tipo: offer.tipo_contrato,
+            ubicacion: offer.ubicacion,
+            duracion: offer.duracion || "",
+            salario: offer.salario || "",
+            habilidades: offer.requisitos ? offer.requisitos.split(", ") : [],
+        });
+        setShowForm(true);
+    };
+
+    const handleDeleteOffer = (id: number) => {
+        if (window.confirm("¿Estás seguro de eliminar esta vacante?")) {
+            deleteOfferMutation.mutate({ id, orgId }, {
+                onSuccess: () => {
+                    setSaveMessage({ type: "success", text: "Oferta eliminada" });
+                    setTimeout(() => setSaveMessage(null), 3000);
+                }
+            });
+        }
     };
 
     return {
@@ -123,6 +198,8 @@ export const useOrganizationProfile = (activeTab: string) => {
         profileErrorMessage,
         profileQuery,
         updateProfileMutation,
+        offersQuery,
+        applicantsQuery,
 
         // Handlers
         handleEditClick,
@@ -133,5 +210,7 @@ export const useOrganizationProfile = (activeTab: string) => {
         addSkill,
         removeSkill,
         handlePublish,
+        handleEditOffer,
+        handleDeleteOffer,
     };
 };

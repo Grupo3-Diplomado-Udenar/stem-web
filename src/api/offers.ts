@@ -33,4 +33,27 @@ export const offersApi = {
         const payload = await http<unknown>("/offers");
         return normalizeList<OfferRecord>(payload, "offers");
     },
+    listByOrganization: async (orgId: string) => {
+        const payload = await http<unknown>(`/offers/organization/${orgId}`);
+        return normalizeList<OfferRecord>(payload, "offers");
+    },
+    create: (dto: Partial<OfferRecord>) => {
+        return http<OfferRecord>("/offers", {
+            method: "POST",
+            body: JSON.stringify(dto),
+            headers: { "Content-Type": "application/json" },
+        });
+    },
+    update: (id: number, dto: Partial<OfferRecord>) => {
+        return http<OfferRecord>(`/offers/${id}`, {
+            method: "PUT",
+            body: JSON.stringify(dto),
+            headers: { "Content-Type": "application/json" },
+        });
+    },
+    remove: (id: number) => {
+        return http<void>(`/offers/${id}`, {
+            method: "DELETE",
+        });
+    },
 };
