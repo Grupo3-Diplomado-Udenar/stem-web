@@ -249,14 +249,14 @@ if (sortByDate === "newest") {
                                 <button
                                     key={oferta.id}
                                     onClick={() => handleVerDetalles(oferta)}
-                                    className={`w-full text-left border rounded-xl p-4 transition bg-white hover:shadow-lg hover:border-teal-500 ${
-                                        isSelected ? "border-teal-500 ring-1 ring-teal-200" : "border-gray-200"
+                                    className={`w-full text-left border rounded-xl p-4 transition bg-white hover:shadow-lg hover:border-[#346C84] ${
+                                        isSelected ? "border-[#014766] ring-2 ring-[#014766]/20" : "border-gray-200"
                                     }`}
                                 >
                                     <div className="flex items-start justify-between gap-3">
                                         <div>
                                             <h4 className="text-base font-bold text-gray-900 mb-1 line-clamp-2">{oferta.title}</h4>
-                                            <p className="text-sm text-teal-600 font-medium">{oferta.company}</p>
+                                            <p className="text-sm text-[#346C84] font-medium">{oferta.company}</p>
                                         </div>
                                         <span className="text-xs text-gray-400">{oferta.posted}</span>
                                     </div>
@@ -297,7 +297,7 @@ if (sortByDate === "newest") {
                                     <div className="flex items-start justify-between gap-4 p-6 border-b border-gray-200">
                                         <div className="flex-1">
                                             <h4 className="text-xl font-bold text-gray-900 mb-1">{selectedOferta.title}</h4>
-                                            <p className="text-sm text-teal-600 font-medium">{selectedOferta.company}</p>
+                                            <p className="text-sm text-[#346C84] font-medium">{selectedOferta.company}</p>
                                         </div>
                                         <button
                                             onClick={() => setSelectedOferta(null)}
@@ -375,7 +375,7 @@ if (sortByDate === "newest") {
                         <div className="flex items-start justify-between gap-4 p-6 border-b border-gray-200">
                             <div className="flex-1">
                                 <h4 className="text-xl font-bold text-gray-900 mb-1">{selectedOferta?.title}</h4>
-                                <p className="text-sm text-teal-600 font-medium">{selectedOferta?.company}</p>
+                                <p className="text-sm text-[#346C84] font-medium">{selectedOferta?.company}</p>
                             </div>
                             <button
                                 onClick={() => setSelectedOferta(null)}

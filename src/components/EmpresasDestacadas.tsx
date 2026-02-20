@@ -37,7 +37,7 @@ export default function EmpresasDestacadas({ onVerTodas }: EmpresasDestacadasPro
     if (loading) {
         return (
             <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#346C84]" />
             </div>
         );
     }
@@ -64,7 +64,7 @@ export default function EmpresasDestacadas({ onVerTodas }: EmpresasDestacadasPro
                 <h3 className="text-2xl font-bold text-gray-900">Empresas Destacadas</h3>
                 <button
                     onClick={onVerTodas}
-                    className="text-teal-600 hover:text-teal-700 font-medium transition"
+                    className="text-[#346C84] hover:text-[#014766] font-medium transition"
                 >
                     Ver todas
                 </button>
@@ -86,7 +86,7 @@ export default function EmpresasDestacadas({ onVerTodas }: EmpresasDestacadasPro
                         )}
                         <h4 className="text-lg font-bold text-gray-900 mb-1">{empresa.nombre}</h4>
                         <p className="text-sm text-gray-600 mb-4">{empresa.sector ?? "Sin sector"}</p>
-                        <div className="flex items-center gap-1 text-teal-600 font-medium">
+                        <div className="flex items-center gap-1 text-[#346C84] font-medium">
                             📍 {empresa.vacantes_activas} vacantes activas
                         </div>
                         <div className="text-xs text-gray-400 mt-1">
