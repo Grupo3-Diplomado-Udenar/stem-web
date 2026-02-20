@@ -118,10 +118,14 @@ export const useOrganizationProfile = (activeTab: string) => {
         }
 
         const payload = {
-            ...oferta,
-            id_organizacion: orgId,
+            titulo: oferta.titulo,
+            descripcion: oferta.descripcion,
             requisitos: oferta.habilidades.join(", "),
             tipo_contrato: oferta.tipo,
+            ubicacion: oferta.ubicacion,
+            salario: oferta.salario ? parseFloat(oferta.salario) : undefined,
+            fecha_publicacion: new Date(),
+            id_organizacion: orgId,
         };
 
         const mutation = editingOfferId ? updateOfferMutation : createOfferMutation;
