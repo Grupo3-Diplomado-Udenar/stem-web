@@ -41,19 +41,25 @@ export default function LandingPage({ onLoginSuccess }: LandingPageProps) {
     return (
         <PublicLayout
             header={
-                <Header
-                    variant="public"
-                    onLogin={handleLoginClick}
-                    onRegister={handleRegisterClick}
-                />
+                <div className="space-y-0">
+                    <Header
+                        variant="public"
+                        onLogin={handleLoginClick}
+                        onRegister={handleRegisterClick}
+                    />
+                    {/* Filtros */}
+                    <div className="bg-slate-50">
+                        <div className="mx-auto max-w-7xl px-4">
+                            <FiltersPanel 
+                                onOrganizationChange={setFilterOrganization}
+                                onTitleChange={setFilterTitle}
+                                onDateChange={setSortByDate}
+                            />
+                        </div>
+                    </div>
+                </div>
             }
         >
-                {/* Filtros */}
-                <FiltersPanel 
-                    onOrganizationChange={setFilterOrganization}
-                    onTitleChange={setFilterTitle}
-                    onDateChange={setSortByDate}
-                />
 
                 {/* Ofertas Recientes */}
                 <OfertasRecientes 

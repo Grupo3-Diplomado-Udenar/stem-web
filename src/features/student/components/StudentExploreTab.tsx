@@ -82,11 +82,13 @@ export default function StudentExploreTab() {
     return (
         <div className="space-y-8">
             {/* Filtros */}
+            <div className="sticky top-[116px] z-30 -mx-4 px-4 py-4 bg-white border-b">
             <FiltersPanel 
                 onOrganizationChange={setFilterOrganization}
                 onTitleChange={setFilterTitle}
                 onDateChange={setSortByDate}
             />
+            </div>
 
             {/* Ofertas Recientes */}
             <OfertasRecientes
