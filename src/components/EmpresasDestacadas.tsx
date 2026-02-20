@@ -86,8 +86,11 @@ export default function EmpresasDestacadas({ onVerTodas }: EmpresasDestacadasPro
                         )}
                         <h4 className="text-lg font-bold text-gray-900 mb-1">{empresa.nombre}</h4>
                         <p className="text-sm text-gray-600 mb-4">{empresa.sector ?? "Sin sector"}</p>
-                        <div className="flex items-center gap-1 text-[#346C84] font-medium">
-                            📍 {empresa.vacantes_activas} vacantes activas
+                        <div className="flex items-center gap-2 text-[#346C84] font-medium">
+                            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 7a2 2 0 00-2-2h-3V4a2 2 0 00-2-2h-2a2 2 0 00-2 2v1H6a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V7z" />
+                            </svg>
+                            {empresa.vacantes_activas} vacantes activas
                         </div>
                         <div className="text-xs text-gray-400 mt-1">
                             {empresa.total_postulaciones} postulaciones
