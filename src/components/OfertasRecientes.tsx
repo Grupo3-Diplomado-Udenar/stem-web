@@ -2,7 +2,7 @@
 // Ordenar por fecha de creación descendente
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import { offersApi } from "../api/offers";
+import { useOffersListQuery } from "../hook/useOffers";
 import { organizationsApi } from "../api/organizations";
 
 export interface Oferta {
@@ -47,9 +47,8 @@ export default function OfertasRecientes({
     filterTitle,
     sortByDate,
 }: OfertasRecientesProps) {
+    const { data: offersData = [], isLoading: queryLoading, error: queryError } = useOffersListQuery();
     const [ofertas, setOfertas] = useState<Oferta[]>([]);
-    const [internalLoading, setInternalLoading] = useState(false);
-    const [internalError, setInternalError] = useState<string | null>(null);
     const [selectedOferta, setSelectedOferta] = useState<Oferta | null>(null);
     const orgCacheRef = useRef<Map<string, string>>(new Map());
 
@@ -101,60 +100,40 @@ export default function OfertasRecientes({
         };
 
         const fetchOffers = async () => {
-            setInternalLoading(true);
-            setInternalError(null);
-            try {
-                const records = await offersApi.list();
-                const organizationIds = records.map((record) => record.id_organizacion);
-                await resolveOrganizationNames(organizationIds);
+            if (offersData.length === 0) return;
+            
+            const organizationIds = offersData.map((record) => record.id_organizacion);
+            await resolveOrganizationNames(organizationIds);
 
-                if (!isMounted) return;
+            if (!isMounted) return;
 
-                setOfertas(
-                    records.map((record) => ({
-                        id: record.id_oferta,
-                        title: record.titulo,
-                        company: orgCacheRef.current.get(record.id_organizacion) ?? "Organización",
-                        location: record.ubicacion,
-                        type: record.tipo_contrato,
-                        posted: formatPosted(record.fecha_publicacion),
-                        description: record.descripcion,
-                        requirements: record.requisitos,
-                        salary: record.salario,
-                        closeDate: formatDate(record.fecha_cierre),
-                        publishedDate: new Date(record.fecha_publicacion),
-                        skills: [],
-                    }))
-                );
-            } catch (error) {
-                if (!isMounted) return;
-                const message = error instanceof Error ? error.message : "No se pudieron cargar las ofertas.";
-                setInternalError(message);
-            } finally {
-                if (isMounted) {
-                    setInternalLoading(false);
-                }
-            }
+            setOfertas(
+                offersData.map((record) => ({
+                    id: record.id_oferta,
+                    title: record.titulo,
+                    company: orgCacheRef.current.get(record.id_organizacion) ?? "Organización",
+                    location: record.ubicacion,
+                    type: record.tipo_contrato,
+                    posted: formatPosted(record.fecha_publicacion),
+                    description: record.descripcion,
+                    requirements: record.requisitos,
+                    salary: record.salario,
+                    closeDate: formatDate(record.fecha_cierre),
+                    publishedDate: new Date(record.fecha_publicacion),
+                    skills: [],
+                }))
+            );
         };
 
         fetchOffers();
-        const intervalId = setInterval(fetchOffers, 30000);
 
-        const handleVisibility = () => {
-            if (document.visibilityState === "visible") {
-                fetchOffers();
-            }
-        };
-
-        document.addEventListener("visibilitychange", handleVisibility);
         return () => {
-            clearInterval(intervalId);
-            document.removeEventListener("visibilitychange", handleVisibility);
             isMounted = false;
         };
-    }, []);
+    }, [offersData]);
 
-    const loading = isLoading ?? internalLoading;
+    const loading = isLoading ?? queryLoading;
+    const internalError = queryError instanceof Error ? queryError.message : null;
     const error = errorMessage ?? internalError;
     const deferredOrgFilter = useDeferredValue(filterOrganization ?? "");
     const deferredTitleFilter = useDeferredValue(filterTitle ?? "");

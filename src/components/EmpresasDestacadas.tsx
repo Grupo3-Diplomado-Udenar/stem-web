@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { organizationsApi, type FeaturedOrganization } from "../api/organizations";
+import { useFeaturedOrganizationsQuery } from "../hook/useOrganizations";
 
 interface EmpresasDestacadasProps {
     onVerTodas?: () => void;
@@ -22,17 +21,7 @@ function getSectorIcon(sector: string | null): string {
 }
 
 export default function EmpresasDestacadas({ onVerTodas }: EmpresasDestacadasProps) {
-    const [empresas, setEmpresas] = useState<FeaturedOrganization[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        organizationsApi
-            .listFeatured()
-            .then(setEmpresas)
-            .catch((err) => setError(err.message ?? "Error al cargar empresas"))
-            .finally(() => setLoading(false));
-    }, []);
+    const { data: empresas = [], isLoading: loading, error } = useFeaturedOrganizationsQuery();
 
     if (loading) {
         return (
@@ -45,7 +34,7 @@ export default function EmpresasDestacadas({ onVerTodas }: EmpresasDestacadasPro
     if (error) {
         return (
             <div className="text-center py-8 text-red-500">
-                <p>{error}</p>
+                <p>{error instanceof Error ? error.message : "Error al cargar empresas"}</p>
             </div>
         );
     }

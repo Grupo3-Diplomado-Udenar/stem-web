@@ -8,7 +8,10 @@ export function useOffersListQuery() {
     return useQuery({
         queryKey: OFFERS_QUERY_KEY,
         queryFn: offersApi.list,
-        staleTime: 60_000,
+        staleTime: 2 * 60 * 1000, // 2 minutos
+        gcTime: 5 * 60 * 1000, // 5 minutos
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
     });
 }
 
