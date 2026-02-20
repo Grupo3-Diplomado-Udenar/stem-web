@@ -40,30 +40,30 @@ type OrgTabType = "vacantes" | "aplicantes" | "perfil";
 
 type HeaderProps =
     | {
-          variant: "minimal";
-      }
+        variant: "minimal";
+    }
     | {
-          variant: "public";
-          onLogin: () => void;
-          onRegister: () => void;
-      }
+        variant: "public";
+        onLogin: () => void;
+        onRegister: () => void;
+    }
     | {
-          variant: "student";
-          activeTab: TabType;
-          onTabChange: (tab: TabType) => void;
-      }
+        variant: "student";
+        activeTab: TabType;
+        onTabChange: (tab: TabType) => void;
+    }
     | {
-          variant: "organization";
-          activeTab: OrgTabType;
-          onTabChange: (tab: OrgTabType) => void;
-          onLogout: () => void;
-      };
+        variant: "organization";
+        activeTab: OrgTabType;
+        onTabChange: (tab: OrgTabType) => void;
+        onLogout: () => void;
+    };
 
 export default function Header(props: HeaderProps) {
     return (
-        <header className="border-b bg-white">
-            <div className="mx-auto max-w-7xl px-4">
-                <div className="flex items-center justify-between py-3">
+        <header className="bg-white">
+            <div className="mx-auto max-w-7xl ">
+                <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-20 h-20 rounded-lg bg-white flex items-center justify-center">
                             <img
@@ -76,6 +76,11 @@ export default function Header(props: HeaderProps) {
                             <h1 className="text-lg font-bold text-gray-900">STEM LINK</h1>
                             <p className="text-xs text-gray-500">Portal de Prácticas Profesionales</p>
                         </div>
+                        <div>
+                            <h2 className="text-1xl font-bold mb-2">Encuentra tu Práctica Profesional Ideal</h2>
+                            <p className="mb-6 text-blue-100">Conectamos talento STEM con las mejores oportunidades del sector productivo</p>
+                        </div>
+
                     </div>
 
                     {props.variant === "minimal" ? null : props.variant === "public" ? (
@@ -97,22 +102,20 @@ export default function Header(props: HeaderProps) {
                         <nav className="flex items-center gap-6">
                             <button
                                 onClick={() => props.onTabChange("explorar")}
-                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${
-                                    props.activeTab === "explorar"
-                                        ? "bg-teal-700 text-white"
-                                        : "text-gray-700 hover:bg-gray-100"
-                                }`}
+                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${props.activeTab === "explorar"
+                                    ? "bg-teal-700 text-white"
+                                    : "text-gray-700 hover:bg-gray-100"
+                                    }`}
                             >
                                 <MagnifyingGlassIcon className="h-5 w-5" />
                                 Explorar
                             </button>
                             <button
                                 onClick={() => props.onTabChange("perfil")}
-                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${
-                                    props.activeTab === "perfil"
-                                        ? "bg-teal-700 text-white"
-                                        : "text-gray-700 hover:bg-gray-100"
-                                }`}
+                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${props.activeTab === "perfil"
+                                    ? "bg-teal-700 text-white"
+                                    : "text-gray-700 hover:bg-gray-100"
+                                    }`}
                             >
                                 <UserIcon className="h-5 w-5" />
                                 Mi Perfil
@@ -122,31 +125,28 @@ export default function Header(props: HeaderProps) {
                         <nav className="flex items-center gap-6">
                             <button
                                 onClick={() => props.onTabChange("vacantes")}
-                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${
-                                    props.activeTab === "vacantes"
-                                        ? "bg-teal-700 text-white"
-                                        : "text-gray-700 hover:bg-gray-100"
-                                }`}
+                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${props.activeTab === "vacantes"
+                                    ? "bg-teal-700 text-white"
+                                    : "text-gray-700 hover:bg-gray-100"
+                                    }`}
                             >
                                 📋 Mis Vacantes
                             </button>
                             <button
                                 onClick={() => props.onTabChange("aplicantes")}
-                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${
-                                    props.activeTab === "aplicantes"
-                                        ? "bg-teal-700 text-white"
-                                        : "text-gray-700 hover:bg-gray-100"
-                                }`}
+                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${props.activeTab === "aplicantes"
+                                    ? "bg-teal-700 text-white"
+                                    : "text-gray-700 hover:bg-gray-100"
+                                    }`}
                             >
                                 👥 Aplicantes
                             </button>
                             <button
                                 onClick={() => props.onTabChange("perfil")}
-                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${
-                                    props.activeTab === "perfil"
-                                        ? "bg-teal-700 text-white"
-                                        : "text-gray-700 hover:bg-gray-100"
-                                }`}
+                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${props.activeTab === "perfil"
+                                    ? "bg-teal-700 text-white"
+                                    : "text-gray-700 hover:bg-gray-100"
+                                    }`}
                             >
                                 🏢 Mi Perfil
                             </button>
