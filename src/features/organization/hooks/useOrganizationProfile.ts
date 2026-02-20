@@ -26,7 +26,8 @@ export const useOrganizationProfile = (activeTab: string) => {
     });
     const [skillInput, setSkillInput] = useState("");
 
-    const profileQuery = useProfileQuery(activeTab === "perfil");
+    // Cargar el perfil siempre para obtener el orgId
+    const profileQuery = useProfileQuery(true);
     const updateProfileMutation = useUpdateProfileMutation();
     const profile = profileQuery.data as OrganizationProfile | undefined;
     const orgId = profile?.id_organizacion;

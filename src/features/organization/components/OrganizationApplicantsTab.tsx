@@ -1,4 +1,7 @@
-import { UserIcon, MapPinIcon, ClockIcon, BriefcaseIcon } from "../../../components/ui/Icons";
+import { UserIcon, ClockIcon, BriefcaseIcon } from "../../../components/ui/Icons";
+import { ApplicationStatus } from "../../../api/applications";
+import { useUpdateApplicationStatusMutation } from "../../../hook/useApplications";
+import { useState } from "react";
 
 interface OrganizationApplicantsTabProps {
     applicantsQuery: any;
@@ -6,12 +9,66 @@ interface OrganizationApplicantsTabProps {
 
 export default function OrganizationApplicantsTab({ applicantsQuery }: OrganizationApplicantsTabProps) {
     const applicants = applicantsQuery.data || [];
+    const updateStatusMutation = useUpdateApplicationStatusMutation();
+    const [updatingId, setUpdatingId] = useState<number | null>(null);
+
+    // Debug: ver qué datos llegan
+    console.log('Applicants Query:', applicantsQuery);
+    console.log('Applicants Data:', applicants);
+
+    const handleStatusChange = (id: number, newStatus: string) => {
+        setUpdatingId(id);
+        updateStatusMutation.mutate(
+            { id, dto: { estado: newStatus } },
+            {
+                onSuccess: () => {
+                    setUpdatingId(null);
+                },
+                onError: (error: any) => {
+                    setUpdatingId(null);
+                    alert(`Error al actualizar: ${error.message || 'Intenta de nuevo'}`);
+                },
+            }
+        );
+    };
+
+    const getStatusColor = (status: string) => {
+        const normalizedStatus = status?.toUpperCase();
+        switch (normalizedStatus) {
+            case ApplicationStatus.ACCEPTED:
+            case 'ACEPTADA':
+                return 'bg-green-100 text-green-800';
+            case ApplicationStatus.REJECTED:
+            case 'RECHAZADA':
+                return 'bg-red-100 text-red-800';
+            case ApplicationStatus.IN_REVIEW:
+            case 'EN_REVISION':
+                return 'bg-blue-100 text-blue-800';
+            case ApplicationStatus.WITHDRAWN:
+            case 'RETIRADA':
+                return 'bg-gray-100 text-gray-800';
+            case ApplicationStatus.PENDING:
+            case 'PENDIENTE':
+            default:
+                return 'bg-yellow-100 text-yellow-800';
+        }
+    };
 
     if (applicantsQuery.isLoading) {
         return (
             <div className="text-center py-20">
                 <div className="w-12 h-12 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                 <p className="text-gray-500 font-medium">Cargando candidatos...</p>
+            </div>
+        );
+    }
+
+    if (applicantsQuery.isError) {
+        return (
+            <div className="text-center py-20 bg-red-50 rounded-3xl border-2 border-dashed border-red-200">
+                <div className="text-6xl mb-4">⚠️</div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Error al cargar aplicantes</h2>
+                <p className="text-gray-500">{applicantsQuery.error?.message || "Intenta recargar la página"}</p>
             </div>
         );
     }
@@ -33,55 +90,95 @@ export default function OrganizationApplicantsTab({ applicantsQuery }: Organizat
                 <p className="text-gray-500 mt-1">Revisa el perfil de los estudiantes que aplicaron a tus ofertas</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {applicants.map((app: any) => (
-                    <div key={app.id_postulacion} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                <UserIcon className="h-8 w-8" />
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="text-xl font-bold text-gray-900">
-                                    {app.estudiante.nombres} {app.estudiante.apellidos}
-                                </h3>
-                                <p className="text-teal-600 text-sm font-semibold flex items-center gap-1">
-                                    <BriefcaseIcon className="h-4 w-4" />
-                                    {app.oferta.titulo}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="space-y-3 text-sm text-gray-600 bg-gray-50 p-4 rounded-2xl">
-                            <div className="flex items-center gap-2">
-                                <MapPinIcon className="h-4 w-4 text-gray-400" />
-                                {app.estudiante.ciudad || "Ubicación no especificada"}
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <ClockIcon className="h-4 w-4 text-gray-400" />
-                                Postulado el {new Date(app.fecha_postulacion).toLocaleDateString()}
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 flex items-center justify-center text-gray-400">@</div>
-                                {app.estudiante.email}
-                            </div>
-                            {app.estudiante.celular && (
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 flex items-center justify-center text-gray-400">📞</div>
-                                    {app.estudiante.celular}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="mt-6 flex gap-3">
-                            <button className="flex-1 py-3 bg-blue-900 text-white rounded-xl font-bold hover:bg-blue-950 transition-all shadow-lg shadow-blue-900/10">
-                                Ver Perfil
-                            </button>
-                            <button className="px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-all">
-                                Contactar
-                            </button>
-                        </div>
-                    </div>
-                ))}
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead className="bg-teal-50 border-b border-gray-200">
+                            <tr>
+                                <th className="px-6 py-4 text-left text-sm font-bold text-teal-900 uppercase tracking-wide">
+                                    Vacante
+                                </th>
+                                <th className="px-6 py-4 text-left text-sm font-bold text-teal-900 uppercase tracking-wide">
+                                    Nombre Estudiante
+                                </th>
+                                <th className="px-6 py-4 text-left text-sm font-bold text-teal-900 uppercase tracking-wide">
+                                    Fecha de Postulación
+                                </th>
+                                <th className="px-6 py-4 text-left text-sm font-bold text-teal-900 uppercase tracking-wide">
+                                    Estado Postulación
+                                </th>
+                                <th className="px-6 py-4 text-center text-sm font-bold text-teal-900 uppercase tracking-wide">
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {applicants.map((app: any) => (
+                                <tr key={app.id_postulacion} className="hover:bg-gray-50 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2">
+                                            <BriefcaseIcon className="h-5 w-5 text-teal-600 flex-shrink-0" />
+                                            <span className="font-semibold text-gray-900">
+                                                {app.oferta?.titulo || 'Oferta no disponible'}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0">
+                                                <UserIcon className="h-5 w-5" />
+                                            </div>
+                                            <div>
+                                                <div className="font-semibold text-gray-900">
+                                                    {app.estudiante?.nombres || 'N/A'} {app.estudiante?.apellidos || ''}
+                                                </div>
+                                                <div className="text-sm text-gray-500">
+                                                    {app.estudiante?.email || 'Email no disponible'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2 text-gray-700">
+                                            <ClockIcon className="h-4 w-4 text-gray-400" />
+                                            <span>{new Date(app.fecha_postulacion).toLocaleDateString('es-ES', { 
+                                                year: 'numeric', 
+                                                month: 'short', 
+                                                day: 'numeric' 
+                                            })}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <select
+                                            value={app.estado || ApplicationStatus.PENDING}
+                                            onChange={(e) => handleStatusChange(app.id_postulacion, e.target.value)}
+                                            disabled={updatingId === app.id_postulacion}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 cursor-pointer transition-all ${getStatusColor(app.estado)} ${
+                                                updatingId === app.id_postulacion ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'
+                                            }`}
+                                        >
+                                            <option value={ApplicationStatus.PENDING}>Pendiente</option>
+                                            <option value={ApplicationStatus.IN_REVIEW}>En Revisión</option>
+                                            <option value={ApplicationStatus.ACCEPTED}>Aceptada</option>
+                                            <option value={ApplicationStatus.REJECTED}>Rechazada</option>
+                                            <option value={ApplicationStatus.WITHDRAWN}>Retirada</option>
+                                        </select>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center justify-center gap-2">
+                                            <button className="px-4 py-2 bg-teal-600 text-white text-sm rounded-lg font-medium hover:bg-teal-700 transition-colors">
+                                                Ver Perfil
+                                            </button>
+                                            <button className="px-4 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                                                Contactar
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );
