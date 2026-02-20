@@ -1,3 +1,7 @@
+// TODO: Conectar este componente con el backend
+// Empresas destacadas deben ordenarse por mayor número de postulaciones
+// Pendiente implementación de consulta dinámica
+
 interface EmpresasDestacadasProps {
     onVerTodas?: () => void;
 }
