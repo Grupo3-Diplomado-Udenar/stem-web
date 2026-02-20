@@ -8,6 +8,7 @@ export interface Oferta {
     duracion: string;
     salario: string;
     habilidades: string[];
+    fecha_cierre?: string;
 }
 
 export interface OrganizationProfile {

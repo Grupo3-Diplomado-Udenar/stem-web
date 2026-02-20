@@ -23,6 +23,7 @@ export const useOrganizationProfile = (activeTab: string) => {
         duracion: "",
         salario: "",
         habilidades: [],
+        fecha_cierre: "",
     });
     const [skillInput, setSkillInput] = useState("");
 
@@ -126,6 +127,9 @@ export const useOrganizationProfile = (activeTab: string) => {
             tipo_contrato: oferta.tipo,
             ubicacion: oferta.ubicacion,
             salario: oferta.salario ? parseFloat(oferta.salario) : undefined,
+            fecha_cierre: oferta.fecha_cierre 
+                ? new Date(`${oferta.fecha_cierre}T12:00:00Z`)  // 12:00:00 UTC para que sea el mismo día en cualquier zona horaria
+                : undefined,
             id_organizacion: orgId,
         };
 
@@ -153,6 +157,7 @@ export const useOrganizationProfile = (activeTab: string) => {
                     duracion: "",
                     salario: "",
                     habilidades: [],
+                    fecha_cierre: "",
                 });
                 setEditingOfferId(null);
                 setShowForm(false);
@@ -177,6 +182,9 @@ export const useOrganizationProfile = (activeTab: string) => {
             duracion: offer.duracion || "",
             salario: offer.salario || "",
             habilidades: offer.requisitos ? offer.requisitos.split(", ") : [],
+            fecha_cierre: offer.fecha_cierre 
+                ? new Date(offer.fecha_cierre).toISOString().split('T')[0]
+                : "",
         });
         setShowForm(true);
     };

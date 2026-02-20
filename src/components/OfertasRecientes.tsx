@@ -63,6 +63,7 @@ export default function OfertasRecientes({
                 day: "2-digit",
                 month: "short",
                 year: "numeric",
+                timeZone: "America/Bogota",
             }).format(date);
             return `Publicado el ${formatted}`;
         };
@@ -75,6 +76,7 @@ export default function OfertasRecientes({
                 day: "2-digit",
                 month: "short",
                 year: "numeric",
+                timeZone: "America/Bogota",
             }).format(date);
         };
 
