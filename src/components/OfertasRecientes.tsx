@@ -1,3 +1,6 @@
+// TODO: Implementar consulta para traer ofertas recién publicadas
+// Ordenar por fecha de creación descendente
+
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { offersApi } from "../api/offers";
 import { organizationsApi } from "../api/organizations";
