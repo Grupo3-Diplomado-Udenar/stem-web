@@ -115,37 +115,7 @@ export default function Header(props: HeaderProps) {
                                 Mi Perfil
                             </button>
                         </nav>
-                    ) : (
-                        <nav className="flex items-center gap-6">
-                            <button
-                                onClick={() => props.onTabChange("vacantes")}
-                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${props.activeTab === "vacantes"
-                                    ? "bg-[#014766] text-white"
-                                    : "text-gray-700 hover:bg-gray-100"
-                                    }`}
-                            >
-                                📋 Mis Vacantes
-                            </button>
-                            <button
-                                onClick={() => props.onTabChange("aplicantes")}
-                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${props.activeTab === "aplicantes"
-                                    ? "bg-[#014766] text-white"
-                                    : "text-gray-700 hover:bg-gray-100"
-                                    }`}
-                            >
-                                👥 Aplicantes
-                            </button>
-                            <button
-                                onClick={() => props.onTabChange("perfil")}
-                                className={`px-4 py-2 text-sm font-medium rounded transition flex items-center gap-2 ${props.activeTab === "perfil"
-                                    ? "bg-[#014766] text-white"
-                                    : "text-gray-700 hover:bg-gray-100"
-                                    }`}
-                            >
-                                🏢 Mi Perfil
-                            </button>
-                        </nav>
-                    )}
+                    ) : null}
                 </div>
             </div>
         </header>
