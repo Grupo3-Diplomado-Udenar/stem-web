@@ -186,12 +186,28 @@ export default function OfertasRecientes({
         }
 
         // Ordenamiento por fecha
-        if (sortByDate === "newest") {
-            result = [...result].sort((a, b) => b.publishedDate.getTime() - a.publishedDate.getTime());
-        } else if (sortByDate === "oldest") {
-            result = [...result].sort((a, b) => a.publishedDate.getTime() - b.publishedDate.getTime());
-        }
+        // Ordenamiento por fecha con validación segura
+const getSafeTime = (date: Date) => {
+    const time = date?.getTime?.();
+    return Number.isNaN(time) ? 0 : time;
+};
 
+if (sortByDate === "newest") {
+    result = [...result].sort(
+        (a, b) => getSafeTime(b.publishedDate) - getSafeTime(a.publishedDate)
+    );
+} else if (sortByDate === "oldest") {
+    result = [...result].sort(
+        (a, b) => getSafeTime(a.publishedDate) - getSafeTime(b.publishedDate)
+    );
+} else {
+    // Orden por defecto: más recientes primero
+    result = [...result].sort(
+        (a, b) => getSafeTime(b.publishedDate) - getSafeTime(a.publishedDate)
+    );
+}
+        
+       
         return result;
     }, [normalizedOrgFilter, normalizedTitleFilter, sortByDate, ofertas]);
 
