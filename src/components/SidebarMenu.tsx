@@ -21,7 +21,7 @@ export default function SidebarMenu({
     activeId,
     onChange,
     onLogout,
-    logoutLabel = "Sesion cerrar",
+    logoutLabel = "Cerrar Sesión",
 }: SidebarMenuProps) {
     return (
         <div className="rounded-2xl border border-gray-200 bg-white p-4">
