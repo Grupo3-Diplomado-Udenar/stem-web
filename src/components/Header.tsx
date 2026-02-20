@@ -76,9 +76,9 @@ export default function Header(props: HeaderProps) {
                             <h1 className="text-lg font-bold text-gray-900">STEM LINK</h1>
                             <p className="text-xs text-gray-500">Portal de Prácticas Profesionales</p>
                         </div>
-                        <div>
-                            <h2 className="text-1xl font-bold mb-2">Encuentra tu Práctica Profesional Ideal</h2>
-                            <p className="mb-6 text-blue-100">Conectamos talento STEM con las mejores oportunidades del sector productivo</p>
+                        <div className="max-w-xl">
+                            <h2 className="text-xl font-bold text-gray-900 mb-1">Encuentra tu Práctica Profesional Ideal</h2>
+                            <p className="text-xs text-gray-400 leading-relaxed">Conectamos talento STEM con las mejores oportunidades del sector productivo</p>
                         </div>
 
                     </div>
