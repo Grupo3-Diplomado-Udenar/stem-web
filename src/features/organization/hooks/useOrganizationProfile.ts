@@ -117,16 +117,21 @@ export const useOrganizationProfile = (activeTab: string) => {
             return;
         }
 
-        const payload = {
+        // Crear payload base
+        const basePayload = {
             titulo: oferta.titulo,
             descripcion: oferta.descripcion,
             requisitos: oferta.habilidades.join(", "),
             tipo_contrato: oferta.tipo,
             ubicacion: oferta.ubicacion,
             salario: oferta.salario ? parseFloat(oferta.salario) : undefined,
-            fecha_publicacion: new Date(),
             id_organizacion: orgId,
         };
+
+        // Solo agregar fecha_publicacion al crear ofertas nuevas
+        const payload = editingOfferId 
+            ? basePayload 
+            : { ...basePayload, fecha_publicacion: new Date() };
 
         const mutation = editingOfferId ? updateOfferMutation : createOfferMutation;
         const variables = editingOfferId
