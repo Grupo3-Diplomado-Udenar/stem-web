@@ -1,7 +1,8 @@
-import { UserIcon, ClockIcon, BriefcaseIcon } from "../../../components/ui/Icons";
+import { UserIcon, ClockIcon, BriefcaseIcon, CheckCircleIcon, InformationCircleIcon } from "../../../components/ui/Icons";
 import { ApplicationStatus } from "../../../api/applications";
 import { useUpdateApplicationStatusMutation } from "../../../hook/useApplications";
 import { useState } from "react";
+import StudentProfileModal from "./StudentProfileModal";
 
 interface OrganizationApplicantsTabProps {
     applicantsQuery: any;
@@ -11,10 +12,7 @@ export default function OrganizationApplicantsTab({ applicantsQuery }: Organizat
     const applicants = applicantsQuery.data || [];
     const updateStatusMutation = useUpdateApplicationStatusMutation();
     const [updatingId, setUpdatingId] = useState<number | null>(null);
-
-    // Debug: ver qué datos llegan
-    console.log('Applicants Query:', applicantsQuery);
-    console.log('Applicants Data:', applicants);
+    const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 
     const handleStatusChange = (id: number, newStatus: string) => {
         setUpdatingId(id);
@@ -30,6 +28,12 @@ export default function OrganizationApplicantsTab({ applicantsQuery }: Organizat
                 },
             }
         );
+    };
+
+    const handleHire = (id: number) => {
+        if (window.confirm("¿Estás seguro de que deseas contratar a este candidato? El estado de la postulación cambiará a 'ACEPTADA'.")) {
+            handleStatusChange(id, ApplicationStatus.ACCEPTED);
+        }
     };
 
     const getStatusColor = (status: string) => {
@@ -85,6 +89,13 @@ export default function OrganizationApplicantsTab({ applicantsQuery }: Organizat
 
     return (
         <div className="space-y-8">
+            {selectedStudentId && (
+                <StudentProfileModal
+                    studentId={selectedStudentId}
+                    onClose={() => setSelectedStudentId(null)}
+                />
+            )}
+
             <div>
                 <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Candidatos Postulados</h2>
                 <p className="text-gray-500 mt-1">Revisa el perfil de los estudiantes que aplicaron a tus ofertas</p>
@@ -141,10 +152,10 @@ export default function OrganizationApplicantsTab({ applicantsQuery }: Organizat
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2 text-gray-700">
                                             <ClockIcon className="h-4 w-4 text-gray-400" />
-                                            <span>{new Date(app.fecha_postulacion).toLocaleDateString('es-ES', { 
-                                                year: 'numeric', 
-                                                month: 'short', 
-                                                day: 'numeric' 
+                                            <span>{new Date(app.fecha_postulacion).toLocaleDateString('es-ES', {
+                                                year: 'numeric',
+                                                month: 'short',
+                                                day: 'numeric'
                                             })}</span>
                                         </div>
                                     </td>
@@ -153,9 +164,8 @@ export default function OrganizationApplicantsTab({ applicantsQuery }: Organizat
                                             value={app.estado || ApplicationStatus.PENDING}
                                             onChange={(e) => handleStatusChange(app.id_postulacion, e.target.value)}
                                             disabled={updatingId === app.id_postulacion}
-                                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 cursor-pointer transition-all ${getStatusColor(app.estado)} ${
-                                                updatingId === app.id_postulacion ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'
-                                            }`}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 cursor-pointer transition-all ${getStatusColor(app.estado)} ${updatingId === app.id_postulacion ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'
+                                                }`}
                                         >
                                             <option value={ApplicationStatus.PENDING}>Pendiente</option>
                                             <option value={ApplicationStatus.IN_REVIEW}>En Revisión</option>
@@ -166,12 +176,23 @@ export default function OrganizationApplicantsTab({ applicantsQuery }: Organizat
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center justify-center gap-2">
-                                            <button className="px-4 py-2 bg-teal-600 text-white text-sm rounded-lg font-medium hover:bg-teal-700 transition-colors">
+                                            <button
+                                                onClick={() => setSelectedStudentId(app.id_num)}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-teal-600 text-teal-600 text-xs rounded-lg font-bold hover:bg-teal-50 transition-colors shadow-sm"
+                                            >
+                                                <InformationCircleIcon className="h-4 w-4" />
                                                 Ver Perfil
                                             </button>
-                                            <button className="px-4 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                                                Contactar
-                                            </button>
+                                            {app.estado !== ApplicationStatus.ACCEPTED && (
+                                                <button
+                                                    onClick={() => handleHire(app.id_postulacion)}
+                                                    disabled={updatingId === app.id_postulacion}
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs rounded-lg font-bold hover:bg-teal-700 transition-colors shadow-lg shadow-teal-600/20 disabled:opacity-50"
+                                                >
+                                                    <CheckCircleIcon className="h-4 w-4" />
+                                                    Contratar
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
