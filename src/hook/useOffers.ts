@@ -61,7 +61,7 @@ export function useDeleteOfferMutation() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ id, orgId }: { id: number; orgId?: string }) => offersApi.remove(id),
+        mutationFn: ({ id }: { id: number; orgId?: string }) => offersApi.remove(id),
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: OFFERS_QUERY_KEY });
             if (variables.orgId) {

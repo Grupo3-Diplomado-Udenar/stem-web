@@ -83,11 +83,11 @@ export default function StudentExploreTab() {
         <div className="space-y-8">
             {/* Filtros */}
             <div className="sticky top-[116px] z-30 -mx-4 px-4 py-4 bg-white border-b">
-            <FiltersPanel 
-                onOrganizationChange={setFilterOrganization}
-                onTitleChange={setFilterTitle}
-                onDateChange={setSortByDate}
-            />
+                <FiltersPanel
+                    onOrganizationChange={setFilterOrganization}
+                    onTitleChange={setFilterTitle}
+                    onDateChange={setSortByDate}
+                />
             </div>
 
             {/* Ofertas Recientes */}
@@ -96,7 +96,6 @@ export default function StudentExploreTab() {
                 onVerDetalles={(oferta) => {
                     console.log("Ver detalles de oferta:", oferta);
                 }}
-                onVerTodas={() => { }}
                 isAuthenticated={true}
                 applyingId={applyingId}
                 appliedIds={appliedIds}

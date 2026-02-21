@@ -1,6 +1,6 @@
 import { http } from "./http";
 
-export class Student {
+export interface Student {
     numero_identificacion: string;
     tipo_identificacion: string;
     nombres: string;

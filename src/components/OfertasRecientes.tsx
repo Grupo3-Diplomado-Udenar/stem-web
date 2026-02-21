@@ -23,7 +23,6 @@ export interface Oferta {
 interface OfertasRecientesProps {
     onVerDetalles?: (oferta: Oferta) => void;
     onPostular?: (oferta: Oferta) => void;
-    onVerTodas?: () => void;
     isAuthenticated?: boolean;
     isLoading?: boolean;
     errorMessage?: string;
@@ -37,7 +36,6 @@ interface OfertasRecientesProps {
 export default function OfertasRecientes({
     onVerDetalles,
     onPostular,
-    onVerTodas,
     isAuthenticated,
     isLoading,
     errorMessage,
@@ -103,7 +101,7 @@ export default function OfertasRecientes({
 
         const fetchOffers = async () => {
             if (offersData.length === 0) return;
-            
+
             const organizationIds = offersData.map((record) => record.id_organizacion);
             await resolveOrganizationNames(organizationIds);
 
@@ -147,47 +145,47 @@ export default function OfertasRecientes({
             .trim();
     const normalizedOrgFilter = normalizeText(deferredOrgFilter);
     const normalizedTitleFilter = normalizeText(deferredTitleFilter);
-    
+
     const filteredOfertas = useMemo(() => {
         let result = ofertas;
 
         // Filtro por organización
         if (normalizedOrgFilter) {
-            result = result.filter((oferta) => 
+            result = result.filter((oferta) =>
                 normalizeText(oferta.company).includes(normalizedOrgFilter)
             );
         }
 
         // Filtro por título
         if (normalizedTitleFilter) {
-            result = result.filter((oferta) => 
+            result = result.filter((oferta) =>
                 normalizeText(oferta.title).includes(normalizedTitleFilter)
             );
         }
 
         // Ordenamiento por fecha
         // Ordenamiento por fecha con validación segura
-const getSafeTime = (date: Date) => {
-    const time = date?.getTime?.();
-    return Number.isNaN(time) ? 0 : time;
-};
+        const getSafeTime = (date: Date) => {
+            const time = date?.getTime?.();
+            return Number.isNaN(time) ? 0 : time;
+        };
 
-if (sortByDate === "newest") {
-    result = [...result].sort(
-        (a, b) => getSafeTime(b.publishedDate) - getSafeTime(a.publishedDate)
-    );
-} else if (sortByDate === "oldest") {
-    result = [...result].sort(
-        (a, b) => getSafeTime(a.publishedDate) - getSafeTime(b.publishedDate)
-    );
-} else {
-    // Orden por defecto: más recientes primero
-    result = [...result].sort(
-        (a, b) => getSafeTime(b.publishedDate) - getSafeTime(a.publishedDate)
-    );
-}
-        
-       
+        if (sortByDate === "newest") {
+            result = [...result].sort(
+                (a, b) => getSafeTime(b.publishedDate) - getSafeTime(a.publishedDate)
+            );
+        } else if (sortByDate === "oldest") {
+            result = [...result].sort(
+                (a, b) => getSafeTime(a.publishedDate) - getSafeTime(b.publishedDate)
+            );
+        } else {
+            // Orden por defecto: más recientes primero
+            result = [...result].sort(
+                (a, b) => getSafeTime(b.publishedDate) - getSafeTime(a.publishedDate)
+            );
+        }
+
+
         return result;
     }, [normalizedOrgFilter, normalizedTitleFilter, sortByDate, ofertas]);
 
@@ -230,9 +228,8 @@ if (sortByDate === "newest") {
                                 <button
                                     key={oferta.id}
                                     onClick={() => handleVerDetalles(oferta)}
-                                    className={`w-full text-left border rounded-xl p-4 transition bg-white hover:shadow-lg hover:border-[#346C84] ${
-                                        isSelected ? "border-[#014766] ring-2 ring-[#014766]/20" : "border-gray-200"
-                                    }`}
+                                    className={`w-full text-left border rounded-xl p-4 transition bg-white hover:shadow-lg hover:border-[#346C84] ${isSelected ? "border-[#014766] ring-2 ring-[#014766]/20" : "border-gray-200"
+                                        }`}
                                 >
                                     <div className="flex items-start justify-between gap-3">
                                         <div>
