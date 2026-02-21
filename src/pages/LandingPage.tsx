@@ -50,7 +50,7 @@ export default function LandingPage({ onLoginSuccess }: LandingPageProps) {
                     {/* Filtros */}
                     <div className="bg-slate-50">
                         <div className="mx-auto max-w-7xl px-4">
-                            <FiltersPanel 
+                            <FiltersPanel
                                 onOrganizationChange={setFilterOrganization}
                                 onTitleChange={setFilterTitle}
                                 onDateChange={setSortByDate}
@@ -61,23 +61,22 @@ export default function LandingPage({ onLoginSuccess }: LandingPageProps) {
             }
         >
 
-                {/* Ofertas Recientes */}
-                <OfertasRecientes 
-                    onVerTodas={() => {}}
-                    isAuthenticated={false}
-                    filterOrganization={debouncedOrgFilter}
-                    filterTitle={debouncedTitleFilter}
-                    sortByDate={sortByDate}
-                />
+            {/* Ofertas Recientes */}
+            <OfertasRecientes
+                isAuthenticated={false}
+                filterOrganization={debouncedOrgFilter}
+                filterTitle={debouncedTitleFilter}
+                sortByDate={sortByDate}
+            />
 
-                {/* Empresas Destacadas */}
-                <EmpresasDestacadas onVerTodas={() => {}} />
+            {/* Empresas Destacadas */}
+            <EmpresasDestacadas onVerTodas={() => { }} />
             {/* Modal de Autenticación */}
             {showAuthModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                     <div className="w-full max-w-md">
-                        <AuthPage 
-                            onLoginSuccess={handleAuthSuccess} 
+                        <AuthPage
+                            onLoginSuccess={handleAuthSuccess}
                             onBackClick={handleCloseModal}
                             isModal={true}
                         />
