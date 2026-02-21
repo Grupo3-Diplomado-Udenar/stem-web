@@ -13,7 +13,7 @@ export default function MainLayout({ sidebar, header, children }: MainLayoutProp
                 <div className="grid gap-6 md:grid-cols-[240px_1fr]">
                     <aside className="space-y-4">{sidebar}</aside>
                     <div className="space-y-6">
-                        {header ? <div>{header}</div> : null}
+                        {header ? <div className="sticky top-0 z-40 bg-slate-50 border-b">{header}</div> : null}
                         <main>{children}</main>
                     </div>
                 </div>

@@ -4,12 +4,13 @@ import Header from "../components/Header";
 import SidebarMenu from "../components/SidebarMenu";
 import Toast from "../components/Toast";
 import MainLayout from "../layouts/MainLayout";
-import { MagnifyingGlassIcon, UserIcon } from "../components/ui/Icons";
+import { MagnifyingGlassIcon, UserIcon, BriefcaseIcon } from "../components/ui/Icons";
 import { useStudentProfile } from "../features/student/hooks/useStudentProfile";
 import StudentExploreTab from "../features/student/components/StudentExploreTab";
 import StudentProfileTab from "../features/student/components/StudentProfileTab";
+import StudentApplicationsTab from "../features/student/components/StudentApplicationsTab";
 
-type TabType = "explorar" | "perfil";
+type TabType = "explorar" | "perfil" | "postulaciones";
 
 export default function StudentsPage() {
     const [activeTab, setActiveTab] = useState<TabType>("explorar");
@@ -46,6 +47,7 @@ export default function StudentsPage() {
 
     const sidebarItems = [
         { id: "explorar", label: "Explorar", icon: <MagnifyingGlassIcon className="h-5 w-5" /> },
+        { id: "postulaciones", label: "Postulaciones", icon: <BriefcaseIcon className="h-5 w-5" /> },
         { id: "perfil", label: "Mi Perfil", icon: <UserIcon className="h-5 w-5" /> },
     ];
 
@@ -71,6 +73,8 @@ export default function StudentsPage() {
             ) : null}
 
             {activeTab === "explorar" && <StudentExploreTab />}
+
+            {activeTab === "postulaciones" && <StudentApplicationsTab />}
 
             {activeTab === "perfil" && (
                 <StudentProfileTab

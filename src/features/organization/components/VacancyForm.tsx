@@ -109,6 +109,17 @@ export default function VacancyForm({
                     </div>
 
                     <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de Cierre (Opcional)</label>
+                        <input
+                            type="date"
+                            name="fecha_cierre"
+                            value={oferta.fecha_cierre}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
+                        />
+                    </div>
+
+                    <div>
                         <label className="block text-sm font-medium text-teal-600 mb-2">Habilidades Requeridas *</label>
                         <div className="flex gap-2 mb-3">
                             <select

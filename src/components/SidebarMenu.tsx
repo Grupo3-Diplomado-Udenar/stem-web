@@ -21,7 +21,7 @@ export default function SidebarMenu({
     activeId,
     onChange,
     onLogout,
-    logoutLabel = "Cerrar Sesion",
+    logoutLabel = "Cerrar Sesión",
 }: SidebarMenuProps) {
     return (
         <div className="rounded-2xl border border-gray-200 bg-white p-4">
@@ -33,7 +33,7 @@ export default function SidebarMenu({
                         onClick={() => onChange(item.id)}
                         className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
                             activeId === item.id
-                                ? "bg-teal-700 text-white"
+                                ? "bg-[#014766] text-white"
                                 : "text-gray-700 hover:bg-gray-100"
                         }`}
                     >
